@@ -1,12 +1,10 @@
 cc := 'clang'
 cmake := 'cmake'
 
-cmake_flags := '-DCMAKE_BUILD_TYPE=Debug'
-
 cc_path := shell('which $1', cc)
 
-srcs := shell('fd -e $1 -E $2 -E $3 | xargs', 'c', build_path, external_path)
-include := shell('fd -e $1 -E $2 -E $3 | xargs', 'h', build_path, external_path)
+srcs := shell('fd -e $1 -0 -E $2 -E $3 | xargs -0', 'c', build_path, external_path)
+include := shell('fd -e $1 -0 -E $2 -E $3 | xargs -0', 'h', build_path, external_path)
 
 build_path := 'build'
 external_path := 'external'
@@ -15,13 +13,16 @@ external_path := 'external'
 default:
     @just -f {{justfile()}} --list
 
+install: build
+    @{{cmake}} --install {{build_path}}
+
 # build the executable
-build: cmake
+build:
     @{{cmake}} --build {{build_path}}
 
 # create cmake build system
-cmake:
-    @cmake -DCMAKE_C_COMPILER={{cc_path}} {{cmake_flags}} -S . -B {{build_path}}
+cmake type="Debug":
+    @cmake -DCMAKE_C_COMPILER={{cc_path}} -DCMAKE_BUILD_TYPE={{type}} -S . -B {{build_path}}
 
 # format source and header files
 format:
