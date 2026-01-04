@@ -3,13 +3,7 @@
 
 #include <sqlite3.h>
 #include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
-#include "log.h"
-#include "path.h"
 #include "schema.h"
 
 mimir_error openDatabase(sqlite3** db);

@@ -2,9 +2,6 @@
 #define __MIMIR_PATH_H__
 
 #include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
 
 #include "schema.h"
 

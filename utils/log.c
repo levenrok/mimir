@@ -1,4 +1,9 @@
+#include <stdio.h>
+#include <time.h>
+#include <unistd.h>
+
 #include "log.h"
+#include "path.h"
 
 #define LOG_SIZE 256
 

@@ -1,3 +1,7 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+
 #include "path.h"
 
 mimir_error getAppDataPath(char* path_buffer, char* filename) {

@@ -3,12 +3,7 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
-#include <unistd.h>
 
-#include "path.h"
 #include "schema.h"
 
 /**

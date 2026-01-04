@@ -1,4 +1,11 @@
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include "database.h"
 #include "io.h"
+#include "log.h"
 
 #define CONTENT_SIZE 1024
 

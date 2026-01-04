@@ -1,4 +1,10 @@
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "database.h"
+#include "log.h"
+#include "path.h"
 
 static const int CONTENT_SIZE = 1024;
 static const int SCRIPT_SIZE = (CONTENT_SIZE + 32);
