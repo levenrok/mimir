@@ -1,0 +1,55 @@
+.TH mimir 1 "2026-01-06" "mimir 0.5.0" "User Commands"
+.SH NAME
+mimir \- "the Rememberer" of all your scripts
+.SH SYNOPSIS
+.B mimir
+[\fINAME\fR]
+.br
+.B mimir
+[\fIOPTIONS\fR]
+[\fINAME\fR]
+.SH DESCRIPTION
+.B mimir
+is a a database-driven solution to store and access all your shell/python scripts and one liners in a single place.
+.SH OPTIONS
+.TP
+\fB\-c\fR, \fB\-\-create\fR <\fINAME\fR>
+Create a new script
+.TP
+\fB\-b\fR, \fB\-\-shebang\fR <\fIVALUE\fR>
+Specify a shebang to the new script
+.TP
+\fB\-l\fR, \fB\-\-list\fR
+List all script
+.TP
+\fB\-s\fR, \fB\-\-show\fR <\fINAME\fR>
+Show contents of the specified script
+.SH FILES
+.TP
+.I ~/.local/share/mimir/db.sqlite3
+Script database
+.SH EXAMPLES
+.TP
+Create a script:
+.EX
+    mimir -c greet
+.EE
+.TP
+Add a shebang to the script:
+.EX
+    mimir -c greet -b '#!/usr/bin/env bash'
+.EE
+.TP
+List the stored scripts:
+.EX
+    mimir -l
+.EE
+.TP
+Show the contents of a script:
+.EX
+    mimir -s greet
+.EE
+.SH AUTHORS
+Leven Rochana <levenrok@proton.me>
+.SH LICENSE
+MIT - see https://github.com/levenrok/mimir/blob/main/LICENSE
