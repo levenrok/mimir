@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -90,6 +91,6 @@ void printHelp(char* program_name) {
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "\t-c, --create <name>\tCreate a new script\n");
     fprintf(stderr, "\t-b, --shebang <name>\tSpecify a shebang to the new script\n");
-    fprintf(stderr, "\t-l, --list\tList all scripts\n");
-    fprintf(stderr, "\t-s, --show\tShow contents of the specified script\n");
+    fprintf(stderr, "\t-l, --list\t\tList all scripts\n");
+    fprintf(stderr, "\t-s, --show\t\tShow contents of the specified script\n");
 }

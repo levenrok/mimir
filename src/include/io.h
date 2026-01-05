@@ -2,9 +2,8 @@
 #define __MIMIR_IO_H__
 
 #include <sqlite3.h>
-#include <stdio.h>
 
-#include "schema.h"
+#include "err.h"
 
 /**
  * Helper function to get the script's content

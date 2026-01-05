@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
-#include "path.h"
+#include "fs.h"
 
 mimir_error getAppDataPath(char* path_buffer, char* filename) {
     const char* data_home = getenv("XDG_DATA_HOME");

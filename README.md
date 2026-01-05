@@ -21,8 +21,8 @@ Usage:
 Options:
     -c, --create <name>    Create a new script
     -b, --shebang <name>   Specify a shebang to the new script
-    -l, --list    List all scripts
-    -s, --show    Show contents of the specified script
+    -l, --list             List all scripts
+    -s, --show             Show contents of the specified script
 
 ```
 
@@ -125,8 +125,8 @@ Usage:
 Options:
     -c, --create <name>    Create a new script
     -b, --shebang <name>   Specify a shebang to the new script
-    -l, --list    List all scripts
-    -s, --show    Show contents of the specified script
+    -l, --list             List all scripts
+    -s, --show             Show contents of the specified script
 
 ```
 

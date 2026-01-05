@@ -1,11 +1,11 @@
 #include <getopt.h>
 #include <sqlite3.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 
-#include "schema.h"
-
 #include "database.h"
+#include "err.h"
 #include "io.h"
 
 /**

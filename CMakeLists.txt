@@ -11,9 +11,9 @@ find_library(SQLITE sqlite3)
 set(SRCS
     main.c 
     src/database.c
-    src/io.c 
+    src/io.c
+    utils/fs.c
     utils/log.c
-    utils/path.c
     external/cJSON.c
 )
 

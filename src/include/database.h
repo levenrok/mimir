@@ -4,7 +4,13 @@
 #include <sqlite3.h>
 #include <stdbool.h>
 
-#include "schema.h"
+#include "err.h"
+
+typedef struct {
+    char name[128];
+    char contents[1024];
+    char shebang[32];
+} ScriptInfo;
 
 mimir_error openDatabase(sqlite3** db);
 mimir_error insertScript(sqlite3* db, char* name, char* content, char* shebang);

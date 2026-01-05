@@ -4,7 +4,14 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
-#include "schema.h"
+typedef int log_level;
+
+enum LogLevel {
+    SUCCESS,
+    INFO,
+    WARNING,
+    ERROR,
+};
 
 /**
  * @brief function to help with logging application status
