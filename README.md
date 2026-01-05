@@ -7,7 +7,7 @@
 </p>
 <br>
 
-`mimir` is a database-driven solution to store and access your all your shell/python scripts and one liners in a single place.
+`mimir` is a database-driven solution to store and access all your shell/python scripts and one liners in a single place.
 
 ## Usage
 
@@ -16,13 +16,13 @@ Just running `mimir` lists out the options available.
 ```console
 $ mimir
 Usage:
-    ./mimir [name]
-    ./mimir [options] [name]
+    mimir [name]
+    mimir [options] [name]
 Options:
     -c, --create <name>    Create a new script
-    -b, --shebang <name>   Specify a shebang to the new script
+    -b, --shebang <value>  Specify a shebang to the new script
     -l, --list             List all scripts
-    -s, --show             Show contents of the specified script
+    -s, --show <name>      Show contents of the specified script
 
 ```
 
@@ -124,9 +124,9 @@ Usage:
     ./mimir [options] [name]
 Options:
     -c, --create <name>    Create a new script
-    -b, --shebang <name>   Specify a shebang to the new script
+    -b, --shebang <value>  Specify a shebang to the new script
     -l, --list             List all scripts
-    -s, --show             Show contents of the specified script
+    -s, --show <name>      Show contents of the specified script
 
 ```
 
