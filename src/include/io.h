@@ -2,14 +2,15 @@
 #define __MIMIR_IO_H__
 
 #include <sqlite3.h>
+#include <stdio.h>
 
 #include "err.h"
 
 /**
  * Helper function to get the script's content
  */
-mimir_error importScriptContent(char* buffer, int buffer_size);
-mimir_error runScriptContent(sqlite3* db, char* name);
+err_t importScriptContent(char* buffer, int buffer_size, FILE** fp);
+err_t runScriptContent(sqlite3* db, char* name, FILE** fp);
 
 void printHelp(char* program_name);
 

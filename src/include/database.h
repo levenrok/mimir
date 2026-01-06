@@ -12,10 +12,10 @@ typedef struct {
     char shebang[32];
 } ScriptInfo;
 
-mimir_error openDatabase(sqlite3** db);
-mimir_error insertScript(sqlite3* db, char* name, char* content, char* shebang);
-mimir_error getScripts(sqlite3* db);
-mimir_error getScript(sqlite3* db, char* name, char* buffer, bool shebang);
+err_t openDatabase(sqlite3** db);
+err_t insertScript(sqlite3* db, char* name, char* content, char* shebang);
+err_t getScripts(sqlite3* db);
+err_t getScript(sqlite3* db, char* name, char* buffer, bool shebang);
 void closeDatabase(sqlite3** db);
 
 #endif  // __MIMIR_DATABASE_H__

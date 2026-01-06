@@ -7,6 +7,7 @@
 #include "database.h"
 #include "err.h"
 #include "io.h"
+#include "log.h"
 
 /**
  * Main Entrypoint
@@ -17,8 +18,9 @@ int main(int argc, char* argv[]) {
     int opt = 0;
 
     sqlite3* db = NULL;
+    FILE* fp = NULL;
 
-    openDatabase(&db);
+    _err_handler(openDatabase(&db), &db, &fp);
 
     struct option cli_options[] = {
         {"create", required_argument, NULL, 'c'},
@@ -28,20 +30,20 @@ int main(int argc, char* argv[]) {
         {NULL, 0, NULL, 0},
     };
 
-    ScriptInfo script;
+    ScriptInfo script = {0};
 
     if (argc < 2) {
         goto err_arg;
     }
 
-    while ((opt = getopt_long(argc, argv, "c:b:s:le:", cli_options, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, "c:b:s:l", cli_options, NULL)) != -1) {
         switch (opt) {
             case 'c':
                 buf_size = sizeof(char) * 128;
                 strncpy(script.name, optarg, buf_size);
                 script.name[buf_size - 1] = '\0';
 
-                importScriptContent(script.contents, 1024);
+                _err_handler(importScriptContent(script.contents, 1024, &fp), &db, &fp);
                 insert_flag = true;
                 break;
             case 'b':
@@ -51,23 +53,20 @@ int main(int argc, char* argv[]) {
 
                 // Prevents the user from specifying a 'shebang' if the 'create' flag is not used
                 if (!insert_flag) {
-                    fprintf(stderr, "\033[31mOnly specify a shebang when creating a new script!\033[0m\n");
+                    STDOUT_LOGGER_ERROR("Only specify a shebang when creating a new script!");
                     goto err_arg;
                 }
 
                 insert_flag = true;
                 break;
             case 's':
-                (void)getScript(db, optarg, NULL, true);
+                _err_handler(getScript(db, optarg, NULL, true), &db, &fp);
 
                 insert_flag = false;
                 break;
             case 'l':
-                (void)getScripts(db);
+                _err_handler(getScripts(db), &db, &fp);
 
-                insert_flag = false;
-                break;
-            case 'e':
                 insert_flag = false;
                 break;
             default:
@@ -75,8 +74,8 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (insert_flag && (insertScript(db, script.name, script.contents, script.shebang) != OK)) {
-        return DB_INSERT_ERROR;
+    if (insert_flag) {
+        _err_handler(insertScript(db, script.name, script.contents, script.shebang), &db, &fp);
     }
 
     for (int i = optind; i < argc; i++) {
@@ -84,7 +83,7 @@ int main(int argc, char* argv[]) {
         strncpy(script.name, argv[i], buf_size);
         script.name[buf_size - 1] = '\0';
 
-        runScriptContent(db, script.name);
+        _err_handler(runScriptContent(db, script.name, &fp), &db, &fp);
     }
 
     closeDatabase(&db);
@@ -93,9 +92,9 @@ int main(int argc, char* argv[]) {
 err_arg:
     closeDatabase(&db);
     printHelp(argv[0]);
-    return CLI_INVALID_ARG;
+    return ERR;
 err_opt:
     closeDatabase(&db);
     printHelp(argv[0]);
-    return CLI_INVALID_OPT;
+    return ERR;
 }

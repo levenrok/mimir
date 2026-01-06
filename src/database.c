@@ -14,24 +14,29 @@ static int callbackSelectAllDatabase(void* _data, int argc, char** argv, char** 
 static int callbackSelectScriptDatabase(void* data, int argc, char** argv, char** azColName);
 static int callbackSelectContentDatabase(void* data, int argc, char** argv, char** azColName);
 
-mimir_error openDatabase(sqlite3** db) {
+err_t openDatabase(sqlite3** db) {
     int err = 0;
     char* err_msg = NULL;
 
+    err_t rc = OK;
+
     char database_path[256];
 
-    (void)getAppDataPath(database_path, "db.sqlite3");
+    if (getAppDataPath(database_path, "db.sqlite3") != OK) {
+        rc = ERR_DB_OPEN;
+        goto err;
+    }
 
     err = sqlite3_open_v2(database_path, db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
     if (err != SQLITE_OK) {
-        logStatus(ERROR, "db", true, "%s :(", sqlite3_errmsg(*db));
+        logger(ERROR, "db", "%s", sqlite3_errmsg(*db));
+        rc = ERR_DB_OPEN;
         goto err;
     }
 
     err = sqlite3_exec(*db, "PRAGMA journal_mode = wal;", NULL, NULL, &err_msg);
     if (err != SQLITE_OK) {
-        logStatus(ERROR, "db", false, "%s :(", err_msg);
-        goto err;
+        logger(WARNING, "db", "%s", err_msg);
     }
 
     err = sqlite3_exec(*db,
@@ -42,25 +47,26 @@ mimir_error openDatabase(sqlite3** db) {
                        "content TEXT NOT NULL);",
                        callbackInsertDatabase, NULL, &err_msg);
     if (err != SQLITE_OK) {
-        logStatus(ERROR, "db", false, "%s :(", err_msg);
+        logger(ERROR, "db", "%s", err_msg);
+        rc = ERR_DB_OPEN;
         goto err;
     }
 
     sqlite3_extended_result_codes(*db, 1);
 
-    logStatus(SUCCESS, "io", false, "database opened sucessfully! :)");
-
     sqlite3_free(err_msg);
-    return OK;
+    return rc;
 
 err:
     sqlite3_free(err_msg);
-    return DB_OPEN_ERROR;
+    return rc;
 }
 
-mimir_error insertScript(sqlite3* db, char* name, char* content, char* shebang) {
+err_t insertScript(sqlite3* db, char* name, char* content, char* shebang) {
     int err = 0;
     char* err_msg = NULL;
+
+    err_t rc = OK;
 
     char* query = sqlite3_mprintf("INSERT INTO scripts (name, shebang, content) VALUES ('%q', '%q', %Q);", name,
                                   shebang, content);
@@ -69,33 +75,34 @@ mimir_error insertScript(sqlite3* db, char* name, char* content, char* shebang) 
 
     if (err != SQLITE_OK) {
         if (err == SQLITE_CONSTRAINT_UNIQUE) {
-            logStatus(ERROR, "db", false, "%s :(", err_msg);
-            printf("\033[31mscript name must be unique :\\\033[0m");
+            logger(ERROR, "db", "%s", err_msg);
+            rc = ERR_DB_INSERT_UNIQUE;
         } else {
-            logStatus(ERROR, "db", true, "%s :(", err_msg);
+            logger(ERROR, "db", "%s", err_msg);
+            rc = ERR_DB_INSERT;
         }
         goto err;
     }
 
-    logStatus(SUCCESS, "io", true, "script saved sucessfully! :)");
+    STDOUT_LOGGER_SUCCESS("script saved sucessfully! ^_^");
 
     sqlite3_free(query);
     sqlite3_free(err_msg);
-    return OK;
+    return rc;
 
 err:
     sqlite3_free(query);
     sqlite3_free(err_msg);
-    return DB_INSERT_ERROR;
+    return rc;
 }
 
-mimir_error getScripts(sqlite3* db) {
+err_t getScripts(sqlite3* db) {
     int err = 0;
     char* err_msg = NULL;
 
     err = sqlite3_exec(db, "SELECT name, shebang, content FROM scripts;", callbackSelectAllDatabase, NULL, &err_msg);
     if (err != SQLITE_OK) {
-        logStatus(ERROR, "db", true, "%s :(", err_msg);
+        logger(ERROR, "db", "%s", err_msg);
         goto err;
     }
 
@@ -104,10 +111,10 @@ mimir_error getScripts(sqlite3* db) {
 
 err:
     sqlite3_free(err_msg);
-    return DB_SELECT_ERROR;
+    return ERR_DB_SELECT;
 }
 
-mimir_error getScript(sqlite3* db, char* name, char* buffer, bool shebang) {
+err_t getScript(sqlite3* db, char* name, char* buffer, bool shebang) {
     char* query;
 
     int err = 0;
@@ -124,7 +131,7 @@ mimir_error getScript(sqlite3* db, char* name, char* buffer, bool shebang) {
     }
 
     if (err != SQLITE_OK) {
-        logStatus(ERROR, "db", true, "%s :(", err_msg);
+        logger(ERROR, "db", "%s", err_msg);
         goto err;
     }
 
@@ -135,14 +142,14 @@ mimir_error getScript(sqlite3* db, char* name, char* buffer, bool shebang) {
 err:
     sqlite3_free(query);
     sqlite3_free(err_msg);
-    return DB_SELECT_ERROR;
+    return ERR_DB_SELECT;
 }
 
 void closeDatabase(sqlite3** db) {
     if (db != NULL && *db != NULL) {
         sqlite3_close_v2(*db);
         *db = NULL;
-        logStatus(SUCCESS, "io", false, "database closed sucessfully! :)");
+        logger(SUCCESS, "io", "database closed sucessfully!");
     }
 }
 
@@ -157,7 +164,7 @@ static int callbackInsertDatabase(void* _data, int argc, char** argv, char** azC
 int callbackSelectAllDatabase(void* _data, int argc, char** argv, char** azColName) {
     printf("---\n");
     for (int j = 0; j < argc; j++) {
-        if (strcmp(azColName[j], "content") == 0) {
+        if (*argv[j] != '\0' && (strcmp(azColName[j], "content") == 0)) {
             printf("\033[1m%s:\033[0m |\n%s", azColName[j], argv[j]);
         } else {
             printf("\033[1m%s:\033[0m %s\n", azColName[j], argv[j]);
@@ -183,7 +190,14 @@ int callbackSelectScriptDatabase(void* data, int argc, char** argv, char** azCol
         return 1;
     }
 
-    data == NULL ? printf("%s\n\n%s", shebang, content) : snprintf(data, SCRIPT_SIZE, "%s\n\n%s", shebang, content);
+    char script[SCRIPT_SIZE];
+    if (*shebang == '\0') {
+        snprintf(script, SCRIPT_SIZE, "%s", content);
+    } else {
+        snprintf(script, SCRIPT_SIZE, "%s\n\n%s", shebang, content);
+    }
+
+    data == NULL ? printf("%s", script) : snprintf(data, SCRIPT_SIZE, "%s", script);
 
     return 0;
 }

@@ -1,11 +1,11 @@
-#ifndef __MIMIR_PATH_H__
-#define __MIMIR_PATH_H__
+#ifndef __MIMIR_FS_H__
+#define __MIMIR_FS_H__
 
 #include <stdbool.h>
 
 #include "err.h"
 
-mimir_error getAppDataPath(char* path_buffer, char* filename);
-mimir_error ensureDirectoryExists(char* path, bool create_if_not_exist);
+err_t getAppDataPath(char* path_buffer, char* filename);
+err_t ensureDirectoryExists(char* path, bool create_if_not_exist);
 
-#endif
+#endif  // __MIMIR_FS_H__

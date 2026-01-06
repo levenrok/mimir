@@ -3,6 +3,11 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdio.h>
+
+#define STDOUT_LOGGER_SUCCESS(msg) printf("\033[32m%s\033[0m\n", msg)
+#define STDOUT_LOGGER_WARNING(msg) fprintf(stderr, "\033[33m%s\033[0m\n", msg)
+#define STDOUT_LOGGER_ERROR(msg) fprintf(stderr, "\033[31m%s\033[0m\n", msg)
 
 typedef int log_level;
 
@@ -18,9 +23,8 @@ enum LogLevel {
  *
  * @param level Log level defined by the 'LogLevel' enum. (SUCCESS, ERROR, ...)
  * @param tag Optional tag to make debugging easier
- * @param print_stdout Print the log message to stdout or not
  * @param msg Log message to be printed
  */
-void logStatus(log_level level, char* tag, bool print_stdout, char* msg, ...);
+void logger(log_level level, char* tag, char* msg, ...);
 
 #endif  // __MIMIR_LOG_H__
