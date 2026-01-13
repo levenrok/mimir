@@ -93,12 +93,53 @@ Optional:
 - [`just`](https://github.com/casey/just)
 - [`fd`](https://github.com/sharkdp/fd)
 
-### Build
+## Installation
+
+### NixOS (with Flake)
+
+1. Add `mimir` as flake input to your `flake.nix`
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    mimir.url = "github:levenrok/mimir"; 
+  };
+
+  outputs = { self, nixpkgs, mimir, ... }: {
+    nixosConfigurations.your-hostname = nixpkgs.lib.nixosSystem {
+      specialArgs = { inherit mimir; };
+      modules = [
+        ./configuration.nix
+      ];
+    };
+  };
+}
+```
+
+2. Add the package to your system in `configuration.nix`
+
+```nix
+{ pkgs, mimir, ... }: {
+  environment.systemPackages = [
+    mimir.packages.${pkgs.system}.default
+  ];
+}
+```
+
+3. Rebuild the system
+
+```sh
+sudo nixos-rebuild switch
+```
+
+## Building from Source
 
 1. Setup CMake
 
 ```sh
-cmake -DCMAKE_C_COMPILER=$(which clang) -S . -B build
+cmake -DCMAKE_C_COMPILER=clang -S . -B build
 ```
 
 2. Build the Executable
@@ -110,7 +151,7 @@ cmake --build build
 Or use the `justfile`:
 
 ```sh
-just cmake
+just cmake # for gcc: just cmake gcc
 just build
 ```
 
@@ -135,7 +176,7 @@ Options:
 1. Set the build type of CMake
 
 ```sh
-cmake -DCMAKE_C_COMPILER=$(which clang) -DCMAKE_BUILD_TYPE=Release -S . -B build
+cmake -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Release -S . -B build
 ```
 
 2. Build the Executable
@@ -153,7 +194,7 @@ cmake --install build
 Or use the `justfile`:
 
 ```sh
-just cmake Release # set the build type to 'Release'
+just cmake clang Release # set the build type to 'Release'
 just install
 ```
 <br>
@@ -163,6 +204,7 @@ just install
 > ```console
 > $ cmake --install . --prefix ~/.local # will be installed in '~/.local/bin'
 > -- Install configuration: "Release"
+> -- Installing: /home/levenrok/.local/share/man/man1/mimir.1
 > -- Installing: /home/levenrok/.local/bin/mimir
 > $ which mimir
 > /home/levenrok/.local/bin/mimir

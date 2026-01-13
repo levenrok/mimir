@@ -11,25 +11,21 @@
       pkgs = nixpkgs.legacyPackages."${system}";
     in
     {
+      packages.${system}.default = pkgs.callPackage ./default.nix { };
+
       devShells.${system}.default = pkgs.mkShell {
         name = "c";
+
+        inputsFrom = [ self.packages.${system}.default ];
 
         nativeBuildInputs = with pkgs;[
           clang-tools
           clang
+          gcc
 
           gnumake
-          cmake
           valgrind
           gdb
-
-          pkg-config
-        ];
-
-        buildInputs = with pkgs; [
-          zlib
-
-          sqlite
         ];
 
         env.LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [

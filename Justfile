@@ -1,13 +1,13 @@
 cc := 'clang'
 cmake := 'cmake'
 
-cc_path := shell('which $1', cc)
-
 srcs := shell('fd -e $1 -0 -E $2 -E $3 | xargs -0', 'c', build_path, external_path)
 include := shell('fd -e $1 -0 -E $2 -E $3 | xargs -0', 'h', build_path, external_path)
 
 build_path := 'build'
 external_path := 'external'
+
+proc := shell('nproc')
 
 # show available commands
 default:
@@ -18,11 +18,11 @@ install: build
 
 # build the executable
 build:
-    @{{cmake}} --build {{build_path}}
+    @{{cmake}} --build {{build_path}} --parallel {{proc}}
 
 # create cmake build system
-cmake type="Debug":
-    @cmake -DCMAKE_C_COMPILER={{cc_path}} -DCMAKE_BUILD_TYPE={{type}} -S . -B {{build_path}}
+cmake compiler=cc type="Debug":
+    @cmake -DCMAKE_C_COMPILER={{compiler}} -DCMAKE_BUILD_TYPE={{type}} -S . -B {{build_path}}
 
 # format source and header files
 format:
