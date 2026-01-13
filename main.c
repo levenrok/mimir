@@ -4,10 +4,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "database.h"
-#include "err.h"
-#include "io.h"
-#include "log.h"
+#include "src/include/database.h"
+#include "src/include/io.h"
+
+#include "src/utils/include/err.h"
+#include "src/utils/include/log.h"
 
 /**
  * Main Entrypoint
@@ -20,7 +21,7 @@ int main(int argc, char* argv[]) {
     sqlite3* db = NULL;
     FILE* fp = NULL;
 
-    _err_handler(openDatabase(&db), &db, &fp);
+    handle_err(openDatabase(&db), &db, &fp);
 
     struct option cli_options[] = {
         {"create", required_argument, NULL, 'c'},
@@ -43,7 +44,7 @@ int main(int argc, char* argv[]) {
                 strncpy(script.name, optarg, buf_size);
                 script.name[buf_size - 1] = '\0';
 
-                _err_handler(importScriptContent(script.contents, 1024, &fp), &db, &fp);
+                handle_err(importScriptContent(script.contents, 1024, &fp), &db, &fp);
                 insert_flag = true;
                 break;
             case 'b':
@@ -53,19 +54,19 @@ int main(int argc, char* argv[]) {
 
                 // Prevents the user from specifying a 'shebang' if the 'create' flag is not used
                 if (!insert_flag) {
-                    STDOUT_LOGGER_ERROR("Only specify a shebang when creating a new script!");
+                    STDOUT_LOGGER_ERROR("%s", "Only specify a shebang when creating a new script!");
                     goto err_arg;
                 }
 
                 insert_flag = true;
                 break;
             case 's':
-                _err_handler(getScript(db, optarg, NULL, true), &db, &fp);
+                handle_err(getScript(db, optarg, NULL, true), &db, &fp);
 
                 insert_flag = false;
                 break;
             case 'l':
-                _err_handler(getScripts(db), &db, &fp);
+                handle_err(getScripts(db), &db, &fp);
 
                 insert_flag = false;
                 break;
@@ -75,7 +76,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (insert_flag) {
-        _err_handler(insertScript(db, script.name, script.contents, script.shebang), &db, &fp);
+        handle_err(insertScript(db, script.name, script.contents, script.shebang), &db, &fp);
     }
 
     for (int i = optind; i < argc; i++) {
@@ -83,7 +84,7 @@ int main(int argc, char* argv[]) {
         strncpy(script.name, argv[i], buf_size);
         script.name[buf_size - 1] = '\0';
 
-        _err_handler(runScriptContent(db, script.name, &fp), &db, &fp);
+        handle_err(runScriptContent(db, script.name, &fp), &db, &fp);
     }
 
     closeDatabase(&db);

@@ -2,9 +2,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "database.h"
-#include "fs.h"
-#include "log.h"
+#include "include/database.h"
+
+#include "utils/include/fs.h"
+#include "utils/include/log.h"
 
 static const int CONTENT_SIZE = 1024;
 static const int SCRIPT_SIZE = (CONTENT_SIZE + 32);
@@ -15,85 +16,95 @@ static int callbackSelectScriptDatabase(void* data, int argc, char** argv, char*
 static int callbackSelectContentDatabase(void* data, int argc, char** argv, char** azColName);
 
 err_t openDatabase(sqlite3** db) {
-    int err = 0;
-    char* err_msg = NULL;
+    int rc = 0;
+    char* zErrMsg = NULL;
 
-    err_t rc = OK;
+    err_t ret = OK;
 
     char database_path[256];
 
     if (getAppDataPath(database_path, "db.sqlite3") != OK) {
-        rc = ERR_DB_OPEN;
+        STDOUT_LOGGER_ERROR("%s", "cannot access the database! @_@");
+
+        ret = ERR_DB_ACCESS;
         goto err;
     }
 
-    err = sqlite3_open_v2(database_path, db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
-    if (err != SQLITE_OK) {
+    rc = sqlite3_open_v2(database_path, db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
+    if (rc != SQLITE_OK) {
+        STDOUT_LOGGER_ERROR("%s", "cannot open the database! v_v");
+
         logger(ERROR, "db", "%s", sqlite3_errmsg(*db));
-        rc = ERR_DB_OPEN;
+        ret = ERR_DB_OPEN;
         goto err;
     }
 
-    err = sqlite3_exec(*db, "PRAGMA journal_mode = wal;", NULL, NULL, &err_msg);
-    if (err != SQLITE_OK) {
-        logger(WARNING, "db", "%s", err_msg);
+    rc = sqlite3_exec(*db, "PRAGMA journal_mode = wal;", NULL, NULL, &zErrMsg);
+    if (rc != SQLITE_OK) {
+        logger(WARNING, "db", "%s", zErrMsg);
     }
 
-    err = sqlite3_exec(*db,
-                       "CREATE TABLE IF NOT EXISTS scripts ("
-                       "id INTEGER PRIMARY KEY,"
-                       "name TEXT NOT NULL UNIQUE,"
-                       "shebang TEXT,"
-                       "content TEXT NOT NULL);",
-                       callbackInsertDatabase, NULL, &err_msg);
-    if (err != SQLITE_OK) {
-        logger(ERROR, "db", "%s", err_msg);
-        rc = ERR_DB_OPEN;
+    rc = sqlite3_exec(*db,
+                      "CREATE TABLE IF NOT EXISTS scripts ("
+                      "id INTEGER PRIMARY KEY,"
+                      "name TEXT NOT NULL UNIQUE,"
+                      "shebang TEXT,"
+                      "content TEXT NOT NULL);",
+                      callbackInsertDatabase, NULL, &zErrMsg);
+    if (rc != SQLITE_OK) {
+        STDOUT_LOGGER_ERROR("%s", "cannot create the database table!");
+
+        logger(ERROR, "db", "%s", zErrMsg);
+        ret = ERR_DB_CREATE_TABLE;
         goto err;
     }
 
     sqlite3_extended_result_codes(*db, 1);
 
-    sqlite3_free(err_msg);
-    return rc;
+    sqlite3_free(zErrMsg);
+    return ret;
 
 err:
-    sqlite3_free(err_msg);
-    return rc;
+    sqlite3_free(zErrMsg);
+    return ret;
 }
 
 err_t insertScript(sqlite3* db, char* name, char* content, char* shebang) {
-    int err = 0;
-    char* err_msg = NULL;
+    int rc = 0;
+    char* zErrMsg = NULL;
 
-    err_t rc = OK;
+    err_t ret = OK;
 
     char* query = sqlite3_mprintf("INSERT INTO scripts (name, shebang, content) VALUES ('%q', '%q', %Q);", name,
                                   shebang, content);
 
-    err = sqlite3_exec(db, query, callbackInsertDatabase, NULL, &err_msg);
+    rc = sqlite3_exec(db, query, callbackInsertDatabase, NULL, &zErrMsg);
 
-    if (err != SQLITE_OK) {
-        if (err == SQLITE_CONSTRAINT_UNIQUE) {
-            logger(ERROR, "db", "%s", err_msg);
-            rc = ERR_DB_INSERT_UNIQUE;
+    if (rc != SQLITE_OK) {
+        if (rc == SQLITE_CONSTRAINT_UNIQUE) {
+            STDOUT_LOGGER_ERROR("script with the name '%s' already exists! ++_++", name);
+
+            logger(ERROR, "db", "%s", zErrMsg);
+            ret = ERR_DB_INSERT_UNIQUE;
         } else {
-            logger(ERROR, "db", "%s", err_msg);
-            rc = ERR_DB_INSERT;
+            STDOUT_LOGGER_ERROR("%s", "cannot save script to the database! >_<");
+
+            logger(ERROR, "db", "%s", zErrMsg);
+            ret = ERR_DB_INSERT;
         }
         goto err;
     }
 
-    STDOUT_LOGGER_SUCCESS("script saved sucessfully! ^_^");
+    STDOUT_LOGGER_SUCCESS("script '%s' saved sucessfully! ^_^", name);
 
     sqlite3_free(query);
-    sqlite3_free(err_msg);
-    return rc;
+    sqlite3_free(zErrMsg);
+    return ret;
 
 err:
     sqlite3_free(query);
-    sqlite3_free(err_msg);
-    return rc;
+    sqlite3_free(zErrMsg);
+    return ret;
 }
 
 err_t getScripts(sqlite3* db) {
@@ -102,6 +113,8 @@ err_t getScripts(sqlite3* db) {
 
     err = sqlite3_exec(db, "SELECT name, shebang, content FROM scripts;", callbackSelectAllDatabase, NULL, &err_msg);
     if (err != SQLITE_OK) {
+        STDOUT_LOGGER_ERROR("%s", "cannot get contents of all scripts from the database! 0_0");
+
         logger(ERROR, "db", "%s", err_msg);
         goto err;
     }
@@ -131,6 +144,8 @@ err_t getScript(sqlite3* db, char* name, char* buffer, bool shebang) {
     }
 
     if (err != SQLITE_OK) {
+        STDOUT_LOGGER_ERROR("cannot get contents of '%s' from the database! o_o", name);
+
         logger(ERROR, "db", "%s", err_msg);
         goto err;
     }
@@ -149,7 +164,6 @@ void closeDatabase(sqlite3** db) {
     if (db != NULL && *db != NULL) {
         sqlite3_close_v2(*db);
         *db = NULL;
-        logger(SUCCESS, "io", "database closed sucessfully!");
     }
 }
 

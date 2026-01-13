@@ -1,15 +1,15 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "fs.h"
-#include "log.h"
+#include "include/fs.h"
+#include "include/log.h"
 
 #define LOG_SIZE 256
 
 void logger(log_level level, char* tag, char* msg, ...) {
     char log_path[256];
     if (getAppDataPath(log_path, "mimir.log") != OK) {
-        STDOUT_LOGGER_WARNING("cannot access the log file. aborting logging...");
+        STDOUT_LOGGER_WARNING("%s", "cannot access the log file. stopping logger...");
         return;
     }
 

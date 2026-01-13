@@ -5,9 +5,14 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#define STDOUT_LOGGER_SUCCESS(msg) printf("\033[32m%s\033[0m\n", msg)
-#define STDOUT_LOGGER_WARNING(msg) fprintf(stderr, "\033[33m%s\033[0m\n", msg)
-#define STDOUT_LOGGER_ERROR(msg) fprintf(stderr, "\033[31m%s\033[0m\n", msg)
+#define CLR_RED "\033[31m"
+#define CLR_GRN "\033[32m"
+#define CLR_YLW "\033[33m"
+#define CLR_RST "\033[0m"
+
+#define STDOUT_LOGGER_SUCCESS(fmt, ...) printf(CLR_GRN fmt CLR_RST "\n", __VA_ARGS__)
+#define STDOUT_LOGGER_WARNING(fmt, ...) fprintf(stderr, CLR_YLW fmt CLR_RST "\n", __VA_ARGS__)
+#define STDOUT_LOGGER_ERROR(fmt, ...) fprintf(stderr, CLR_RED fmt CLR_RST "\n", __VA_ARGS__)
 
 typedef int log_level;
 

@@ -3,11 +3,12 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "database.h"
-#include "io.h"
-#include "log.h"
+#include "include/database.h"
+#include "include/io.h"
 
-#define CONTENT_SIZE 1024
+#include "utils/include/log.h"
+
+static const int CONTENT_SIZE = 1024;
 
 err_t importScriptContent(char* buffer, int buffer_size, FILE** fp) {
     char template[] = "/tmp/script_XXXXXX";
@@ -22,24 +23,21 @@ err_t importScriptContent(char* buffer, int buffer_size, FILE** fp) {
 
     fd = mkstemp(template);
     if (fd == -1) {
-        logger(ERROR, "io", "could not create the temp file to get script contents");
         rc = ERR_IO_WRITE;
         goto err;
     }
     close(fd);
 
-    logger(INFO, "io", "opening temp file with '%s'", editor);
     snprintf(command, sizeof(command), "%s %s", editor, template);
 
     if (system(command) == -1) {
-        logger(ERROR, "io", "could not open temp the file with 'editor'");
+        logger(ERROR, "io", "failed to open temp the file with '%s'", editor);
         rc = ERR_IO_READ;
         goto err;
     }
 
     *fp = fopen(template, "r");
     if (fp == NULL) {
-        logger(ERROR, "io", "could not open temp the file to get script contents");
         rc = ERR_IO_READ;
         goto err;
     } else {
@@ -53,13 +51,14 @@ err_t importScriptContent(char* buffer, int buffer_size, FILE** fp) {
     strncpy(buffer, content, buffer_size);
 
     if (remove(template) != 0) {
-        logger(WARNING, "io", "failed to remove temp file :|");
+        logger(WARNING, "io", "failed to delete the temp file after retrieving contents");
     }
 
-    logger(SUCCESS, "io", "got the script contents sucessfully!");
     return rc;
 
 err:
+    STDOUT_LOGGER_ERROR("%s", "cannot capture contents of the script! $_$");
+
     return rc;
 }
 
@@ -71,6 +70,9 @@ err_t runScriptContent(sqlite3* db, char* name, FILE** fp) {
 
     *fp = popen(command, "r");
     if (*fp == NULL) {
+        STDOUT_LOGGER_ERROR("cannot run the script '%s'! ~_~", name);
+
+        logger(ERROR, "io", "failed to create pipe stream to run command '%s'", command);
         return ERR_IO_EXECUTE;
     }
 

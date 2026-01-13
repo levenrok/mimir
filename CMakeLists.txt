@@ -12,19 +12,21 @@ set(SRCS
     main.c 
     src/database.c
     src/io.c
-    utils/err.c
-    utils/fs.c
-    utils/log.c
+    src/utils/err.c
+    src/utils/fs.c
+    src/utils/log.c
     external/cJSON.c
 )
 
 set(EXE mimir)
 
 add_compile_options(-Wall -Werror -Wpedantic)
-include_directories(src/include utils external)
+include_directories(src/include src/utils/include external)
 
 add_executable(${EXE} ${SRCS})
 target_link_libraries(${EXE} PRIVATE ${SQLITE})
+
+install(FILES docs/mimir.1 DESTINATION share/man/man1)
 
 install(TARGETS ${EXE}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

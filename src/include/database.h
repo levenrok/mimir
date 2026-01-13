@@ -4,7 +4,7 @@
 #include <sqlite3.h>
 #include <stdbool.h>
 
-#include "err.h"
+#include "../utils/include/err.h"
 
 typedef struct {
     char name[128];
