@@ -1,4 +1,4 @@
-.TH mimir 1 "2026-01-06" "mimir 0.5.0" "User Commands"
+.TH mimir 1 "2026-01-13" "mimir 0.5.2" "User Commands"
 .SH NAME
 mimir \- "the Rememberer" of all your scripts
 .SH SYNOPSIS
@@ -24,10 +24,6 @@ List all script
 .TP
 \fB\-s\fR, \fB\-\-show\fR <\fINAME\fR>
 Show contents of the specified script
-.SH FILES
-.TP
-.I ~/.local/share/mimir/db.sqlite3
-Script database
 .SH EXAMPLES
 .TP
 Create a script:
@@ -49,6 +45,50 @@ Show the contents of a script:
 .EX
     mimir -s greet
 .EE
+.SH FILES
+.TP
+.I ~/.local/share/mimir/db.sqlite3
+Script database
+.TP
+.I ~/.local/share/mimir/mimir.log
+Log file
+.SH EXIT STATUS
+.TP
+.B 0
+Success. The command completed successfully. \fB[OK]\fR
+.TP
+.B 1
+General error. An unexpected error has occured during the execution \fB[ERR]\fR
+.TP
+.B 5
+Filesystem error. Failed in accessing the data directory (~/.local/share/mimir) \fB[ERR_FS_DATA_PATH_ACCESS]\fR
+.TP
+.B 7
+Input/Output error. Failed to read a necessary file. \fB[ERR_IO_READ]\fR
+.TP
+.B 8
+Input/Output error. Failed to write to a necessary file. \fB[ERR_IO_WRITE]\fR
+.TP
+.B 9
+Input/Output error. Failed to execute the requested script. \fB[ERR_IO_EXECUTE]\fR
+.TP
+.B 10
+Database error. Failed to access the database. \fB[ERR_DB_ACCESS]\fR
+.TP
+.B 11
+Database error. Failed to open the database connection. \fB[ERR_DB_OPEN]\fR
+.TP
+.B 12
+Database error. Failed to create the required database table. \fB[ERR_DB_CREATE_TABLE]\fR
+.TP
+.B 13
+Database error. Failed to save script(s) to the database. \fB[ERR_DB_INSERT]\fR
+.TP
+.B 14
+Database error. Failed to save script(s) because they already exist. \fB[ERR_DB_INSERT_UNIQUE]\fR
+.TP
+.B 15
+Database error. Failed to retrieve script(s) from the database. \fB[ERR_DB_SELECT]\fR
 .SH AUTHORS
 Leven Rochana <levenrok@proton.me>
 .SH LICENSE
