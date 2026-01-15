@@ -12,7 +12,7 @@ set(SRCS
     main.c 
     src/database.c
     src/io.c
-    src/utils/err.c
+    src/utils/errs.c
     src/utils/fs.c
     src/utils/log.c
     external/cJSON.c

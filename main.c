@@ -7,7 +7,7 @@
 #include "src/include/database.h"
 #include "src/include/io.h"
 
-#include "src/utils/include/err.h"
+#include "src/utils/include/errs.h"
 #include "src/utils/include/log.h"
 
 /**

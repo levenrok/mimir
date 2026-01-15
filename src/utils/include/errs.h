@@ -1,5 +1,5 @@
-#ifndef __MIMIR_ERR_H__
-#define __MIMIR_ERR_H__
+#ifndef __MIMIR_ERRS_H__
+#define __MIMIR_ERRS_H__
 
 #include <sqlite3.h>
 #include <stdbool.h>
@@ -31,4 +31,4 @@ enum ErrCode { ERR_INFO };
 
 void handle_err(err_t action, sqlite3** db, FILE** fp);
 
-#endif  // __MIMIR_ERR_H__
+#endif  // __MIMIR_ERRS_H__

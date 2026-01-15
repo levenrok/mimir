@@ -4,7 +4,7 @@
 #include <sqlite3.h>
 #include <stdio.h>
 
-#include "../utils/include/err.h"
+#include "../utils/include/errs.h"
 
 /**
  * Helper function to get the script's content

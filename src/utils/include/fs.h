@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#include "err.h"
+#include "errs.h"
 
 err_t getAppDataPath(char* path_buffer, char* filename);
 err_t ensureDirectoryExists(char* path, bool create_if_not_exist);

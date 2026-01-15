@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "include/err.h"
+#include "include/errs.h"
 #include "include/log.h"
 
 #undef X
