@@ -4,11 +4,11 @@
 #include "include/errs.h"
 #include "include/log.h"
 
-#undef X
-#define X(code, tag, desc, exit) {code, tag, desc, exit},
+#undef X_ERR
+#define X_ERR(code, tag, desc, exit) {code, tag, desc, exit},
 
 typedef struct ErrInfo {
-    err_t err_code;
+    Err err_code;
     char* err_tag;
     char* err_desc;
     bool exit_on_err;
@@ -16,11 +16,11 @@ typedef struct ErrInfo {
 
 static ErrInfo err_table[] = {ERR_INFO};
 
-void handle_err(err_t action, sqlite3** db, FILE** fp) {
+void handle_err(Err action, sqlite3** db, FILE** fp) {
     if (action == OK)
         return;
 
-    err_t code = ERR;
+    Err code = ERR;
     char* tag = NULL;
     char* desc = NULL;
     bool should_exit = true;

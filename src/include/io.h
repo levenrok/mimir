@@ -9,8 +9,8 @@
 /**
  * Helper function to get the script's content
  */
-err_t importScriptContent(char* buffer, int buffer_size, FILE** fp);
-err_t runScriptContent(sqlite3* db, char* name, FILE** fp);
+Err importScriptContent(char* buffer, int buffer_size, FILE** fp);
+Err runScriptContent(sqlite3* db, char* name, FILE** fp);
 
 void printHelp(char* program_name);
 

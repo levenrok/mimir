@@ -10,7 +10,7 @@
 
 static const int CONTENT_SIZE = 1024;
 
-err_t importScriptContent(char* buffer, int buffer_size, FILE** fp) {
+Err importScriptContent(char* buffer, int buffer_size, FILE** fp) {
     char template[] = "/tmp/script_XXXXXX";
 
     const char* editor = getenv("EDITOR") != NULL ? getenv("EDITOR") : "nano";
@@ -19,7 +19,7 @@ err_t importScriptContent(char* buffer, int buffer_size, FILE** fp) {
 
     char content[CONTENT_SIZE];
 
-    err_t rc = OK;
+    Err rc = OK;
 
     fd = mkstemp(template);
     if (fd == -1) {
@@ -57,20 +57,20 @@ err_t importScriptContent(char* buffer, int buffer_size, FILE** fp) {
     return rc;
 
 err:
-    STDOUT_LOGGER_ERROR("%s", "cannot capture contents of the script! $_$");
+    STDOUT_LOGGER_ERROR("%s", "cannot capture contents of the script");
 
     return rc;
 }
 
-err_t runScriptContent(sqlite3* db, char* name, FILE** fp) {
+Err runScriptContent(sqlite3* db, char* name, FILE** fp) {
     char command[1024];
     char output[1024];
 
-    getScriptContent(db, name, command, false);
+    handle_err(getScriptContent(db, name, command, false), &db, fp);
 
     *fp = popen(command, "r");
     if (*fp == NULL) {
-        STDOUT_LOGGER_ERROR("cannot run the script '%s'! ~_~", name);
+        STDOUT_LOGGER_ERROR("cannot run the script '%s'", name);
 
         logger(ERROR, "io", "failed to create pipe stream to run command '%s'", command);
         return ERR_IO_EXECUTE;

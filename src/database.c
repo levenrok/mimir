@@ -13,7 +13,7 @@
 static const int CONTENT_SIZE = 1024;
 static const int SCRIPT_SIZE = (CONTENT_SIZE + 32);
 
-err_t openDatabase(sqlite3** db) {
+Err openDatabase(sqlite3** db) {
     sqlite3_stmt* stmt;
 
     char database_path[256];
@@ -21,7 +21,7 @@ err_t openDatabase(sqlite3** db) {
     int rc = 0;
     char* zErrMsg = NULL;
 
-    err_t ret = OK;
+    Err ret = OK;
 
     if (getAppDataPath(database_path, "db.sqlite3") != OK) {
         STDOUT_LOGGER_ERROR("%s", "cannot access the database");
@@ -80,11 +80,11 @@ err:
     return ret;
 }
 
-err_t insertScript(sqlite3* db, char* name, char* content, char* shebang) {
+Err insertScript(sqlite3* db, char* name, char* content, char* shebang) {
     sqlite3_stmt* stmt;
     const char* sql = "INSERT INTO scripts (name, shebang, content) VALUES (?, ?, ?);";
 
-    err_t ret = OK;
+    Err ret = OK;
 
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK)
@@ -118,7 +118,7 @@ err:
     return ret;
 }
 
-err_t getScripts(sqlite3* db) {
+Err getScripts(sqlite3* db) {
     sqlite3_stmt* stmt;
     const char* sql = "SELECT name, shebang, content FROM scripts;";
 
@@ -150,10 +150,10 @@ err:
     return ERR_DB_SELECT;
 }
 
-err_t getScriptContent(sqlite3* db, char* name, char* buffer, bool get_shebang) {
+Err getScriptContent(sqlite3* db, char* name, char* buffer, bool get_shebang) {
     sqlite3_stmt* stmt;
 
-    err_t ret = OK;
+    Err ret = OK;
 
     const char* sql = get_shebang ? "SELECT shebang, content FROM scripts WHERE name = ?;"
                                   : "SELECT shebang, content FROM scripts WHERE name = ?;";
