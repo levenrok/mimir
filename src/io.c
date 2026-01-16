@@ -84,6 +84,11 @@ Err runScriptContent(sqlite3* db, char* name, FILE** fp) {
     return OK;
 }
 
+void printMan(char* program_name) {
+    if (system("man mimir") != 0)
+        printHelp(program_name);
+}
+
 void printHelp(char* program_name) {
     fprintf(stderr, "Usage:\n\t%s [name]\n\t%s [options] [name]\n\n", program_name, program_name);
     fprintf(stderr, "Options:\n");
@@ -91,4 +96,5 @@ void printHelp(char* program_name) {
     fprintf(stderr, "\t-b, --shebang <value>\tSpecify a shebang to the new script\n");
     fprintf(stderr, "\t-l, --list\t\tList all scripts\n");
     fprintf(stderr, "\t-s, --show <name>\tShow contents of the specified script\n");
+    fprintf(stderr, "\t-h, --help\t\tPrint the help output\n");
 }

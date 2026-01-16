@@ -23,6 +23,7 @@ Options:
     -b, --shebang <value>  Specify a shebang to the new script
     -l, --list             List all scripts
     -s, --show <name>      Show contents of the specified script
+    -h, --help             Print the help output
 
 ```
 
@@ -168,6 +169,7 @@ Options:
     -b, --shebang <value>  Specify a shebang to the new script
     -l, --list             List all scripts
     -s, --show <name>      Show contents of the specified script
+    -h, --help             Print the help output
 
 ```
 

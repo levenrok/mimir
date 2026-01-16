@@ -12,6 +12,7 @@
 Err importScriptContent(char* buffer, int buffer_size, FILE** fp);
 Err runScriptContent(sqlite3* db, char* name, FILE** fp);
 
+void printMan(char* program_name);
 void printHelp(char* program_name);
 
 #endif  // __MIMIR_IO_H__
