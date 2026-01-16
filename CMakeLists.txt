@@ -15,7 +15,9 @@ set(SRCS
     src/utils/errs.c
     src/utils/fs.c
     src/utils/log.c
+    external/argtable3.c
     external/cJSON.c
+    external/ini.c
 )
 
 set(EXE mimir)
@@ -24,7 +26,7 @@ add_compile_options(-Wall -Werror -Wpedantic)
 include_directories(src/include src/utils/include external)
 
 add_executable(${EXE} ${SRCS})
-target_link_libraries(${EXE} PRIVATE ${SQLITE})
+target_link_libraries(${EXE} PRIVATE m ${SQLITE})
 
 install(FILES docs/mimir.1 DESTINATION share/man/man1)
 

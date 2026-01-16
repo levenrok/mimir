@@ -1,5 +1,6 @@
 cc := 'clang'
 cmake := 'cmake'
+make := 'make'
 
 srcs := shell('fd -e $1 -0 -E $2 -E $3 | xargs -0', 'c', build_path, external_path)
 include := shell('fd -e $1 -0 -E $2 -E $3 | xargs -0', 'h', build_path, external_path)
@@ -36,4 +37,8 @@ format_check:
 
 # clean the build directory
 clean:
+    @{{make}} -C {{build_path}} clean/fast
+
+# remove the build directory
+clean_all:
     rm -rf {{build_path}}
