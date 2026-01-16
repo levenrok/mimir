@@ -66,7 +66,7 @@ err_t runScriptContent(sqlite3* db, char* name, FILE** fp) {
     char command[1024];
     char output[1024];
 
-    getScript(db, name, command, false);
+    getScriptContent(db, name, command, false);
 
     *fp = popen(command, "r");
     if (*fp == NULL) {

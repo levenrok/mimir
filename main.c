@@ -61,7 +61,7 @@ int main(int argc, char* argv[]) {
                 insert_flag = true;
                 break;
             case 's':
-                handle_err(getScript(db, optarg, NULL, true), &db, &fp);
+                handle_err(getScriptContent(db, optarg, NULL, true), &db, &fp);
 
                 insert_flag = false;
                 break;

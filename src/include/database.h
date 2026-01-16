@@ -15,7 +15,7 @@ typedef struct {
 err_t openDatabase(sqlite3** db);
 err_t insertScript(sqlite3* db, char* name, char* content, char* shebang);
 err_t getScripts(sqlite3* db);
-err_t getScript(sqlite3* db, char* name, char* buffer, bool shebang);
+err_t getScriptContent(sqlite3* db, char* name, char* buffer, bool get_shebang);
 void closeDatabase(sqlite3** db);
 
 #endif  // __MIMIR_DATABASE_H__

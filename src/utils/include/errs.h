@@ -20,9 +20,10 @@
     X(ERR_DB_CREATE_TABLE, "db", "failed to create database table", true)                     \
     X(ERR_DB_INSERT, "db", "failed to save record(s) to the database", true)                  \
     X(ERR_DB_INSERT_UNIQUE, "db", "failed to save duplicate record(s) to the database", true) \
-    X(ERR_DB_SELECT, "db", "failed to retrieve record(s) from the database", true)
+    X(ERR_DB_SELECT, "db", "failed to retrieve record(s) from the database", true)            \
+    X(ERR_DB_SELECT_NO_MATCH, "db", "failed to find matching record(s) in the database", true)
 
-#define ERR_INFO_COUNT 15
+#define ERR_INFO_COUNT 16
 
 typedef int err_t;
 
