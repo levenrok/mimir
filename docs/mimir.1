@@ -63,32 +63,35 @@ General error. An unexpected error has occured during the execution \fB[ERR]\fR
 .B 5
 Filesystem error. Failed in accessing the data directory (~/.local/share/mimir) \fB[ERR_FS_DATA_PATH_ACCESS]\fR
 .TP
-.B 7
+.B 6
 Input/Output error. Failed to read a necessary file. \fB[ERR_IO_READ]\fR
 .TP
-.B 8
+.B 7
 Input/Output error. Failed to write to a necessary file. \fB[ERR_IO_WRITE]\fR
 .TP
-.B 9
+.B 8
 Input/Output error. Failed to execute the requested script. \fB[ERR_IO_EXECUTE]\fR
 .TP
-.B 10
+.B 9
 Database error. Failed to access the database. \fB[ERR_DB_ACCESS]\fR
 .TP
-.B 11
+.B 10
 Database error. Failed to open the database connection. \fB[ERR_DB_OPEN]\fR
 .TP
-.B 12
+.B 11
 Database error. Failed to create the required database table. \fB[ERR_DB_CREATE_TABLE]\fR
 .TP
-.B 13
+.B 12
 Database error. Failed to save script(s) to the database. \fB[ERR_DB_INSERT]\fR
 .TP
-.B 14
+.B 13
 Database error. Failed to save script(s) because they already exist. \fB[ERR_DB_INSERT_UNIQUE]\fR
 .TP
-.B 15
+.B 14
 Database error. Failed to retrieve script(s) from the database. \fB[ERR_DB_SELECT]\fR
+.TP
+.B 15
+Database error. Failed to find matching script(s) in the database. \fB[ERR_DB_SELECT_NO_MATCH]\fR
 .SH AUTHORS
 Leven Rochana <levenrok@proton.me>
 .SH LICENSE
