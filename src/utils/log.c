@@ -1,3 +1,5 @@
+#include <math.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
@@ -107,4 +109,27 @@ void stdout_logger(LogLevel level, char* fmt, ...) {
     }
 
     va_end(args);
+}
+
+void stdout_debug(const char* msg, const char* code, const char* filename, const int line) {
+    const size_t code_len = (strlen(code) - 1);
+
+    const char* sep = " │ ";
+    // Get the number of digits
+    const size_t line_digits = line == 0 ? 1 : (log10(abs(line)) + 1);
+    const size_t sep_len = (strlen(sep) - 1) + line_digits;
+
+    const int padding = 4;
+
+    // Output: main.c:14 error: buffer overflow occured!
+    fprintf(stderr, "\033[1m%s:%d\033[0m \033[31merror:\033[0m %s\n\n", filename, line, msg);
+    // Output: 14 │
+    fprintf(stderr, "\033[1m%*d\033[0m%s", padding + (int)line_digits, line, sep);
+    // Output: strcpy(buffer, input)
+    fprintf(stderr, "\033[31m%s\033[0m\n", code);
+    // Output: ^~~~~~~~~~~~~~~~~~~~~
+    fprintf(stderr, "\033[31m%*s", padding + (int)sep_len, "^");
+    for (int i = 0; i < code_len; i++)
+        fprintf(stderr, "~");
+    fprintf(stderr, "\033[0m\n");
 }

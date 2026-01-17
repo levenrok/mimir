@@ -16,6 +16,7 @@
 #define STDOUT_LOGGER_INFO(fmt, ...) stdout_logger(INFO, fmt, __VA_ARGS__)
 #define STDOUT_LOGGER_WARNING(fmt, ...) stdout_logger(WARNING, fmt, __VA_ARGS__)
 #define STDOUT_LOGGER_ERROR(fmt, ...) stdout_logger(ERROR, fmt, __VA_ARGS__)
+#define STDOUT_LOGGER_DEBUG(msg, code) stdout_debug(msg, code, __FILE_NAME__, __LINE__)
 
 #define LOG_LEVEL \
     Y(SUCCESS)    \
@@ -36,5 +37,6 @@ typedef enum LogLevel { LOG_LEVEL } LogLevel;
 void logger(LogLevel level, char* tag, char* fmt, ...);
 
 void stdout_logger(LogLevel level, char* fmt, ...);
+void stdout_debug(const char* msg, const char* code, const char* filename, const int line);
 
 #endif  // __MIMIR_LOG_H__
