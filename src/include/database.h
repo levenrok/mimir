@@ -16,6 +16,7 @@ Err openDatabase(sqlite3** db);
 Err insertScript(sqlite3* db, char* name, char* content, char* shebang);
 Err getScripts(sqlite3* db);
 Err getScriptContent(sqlite3* db, char* name, char* buffer, bool get_shebang);
+Err deleteScript(sqlite3* db, char* name);
 void closeDatabase(sqlite3** db);
 
 #endif  // __MIMIR_DATABASE_H__

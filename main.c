@@ -24,9 +24,13 @@ int main(int argc, char* argv[]) {
     handle_err(openDatabase(&db), &db, &fp);
 
     struct option cli_options[] = {
-        {"create", required_argument, NULL, 'c'}, {"shebang", required_argument, NULL, 'b'},
-        {"show", required_argument, NULL, 's'},   {"list", no_argument, NULL, 'l'},
-        {"help", no_argument, NULL, 'h'},         {NULL, 0, NULL, 0},
+        {"create", required_argument, NULL, 'c'},
+        {"shebang", required_argument, NULL, 'b'},
+        {"show", required_argument, NULL, 's'},
+        {"list", no_argument, NULL, 'l'},
+        {"delete", required_argument, NULL, 'd'},
+        {"help", no_argument, NULL, 'h'},
+        {NULL, 0, NULL, 0},
     };
 
     ScriptInfo script = {0};
@@ -35,7 +39,7 @@ int main(int argc, char* argv[]) {
         goto err_arg;
     }
 
-    while ((opt = getopt_long(argc, argv, "c:b:ls:h", cli_options, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, "c:b:ls:d:h", cli_options, NULL)) != -1) {
         switch (opt) {
             case 'c':
                 buf_size = sizeof(char) * 128;
@@ -67,6 +71,13 @@ int main(int argc, char* argv[]) {
                 handle_err(getScriptContent(db, optarg, NULL, true), &db, &fp);
 
                 insert_flag = false;
+                break;
+            case 'd':
+                buf_size = sizeof(char) * 128;
+                strncpy(script.name, optarg, buf_size);
+                script.name[buf_size - 1] = '\0';
+
+                handle_err(deleteScript(db, script.name), &db, &fp);
                 break;
             case 'h':
                 printMan(argv[0]);

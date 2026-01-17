@@ -4,7 +4,6 @@
 
 #include "include/database.h"
 
-#include "sqlite3.h"
 #include "utils/include/fs.h"
 #include "utils/include/log.h"
 
@@ -152,11 +151,10 @@ err:
 
 Err getScriptContent(sqlite3* db, char* name, char* buffer, bool get_shebang) {
     sqlite3_stmt* stmt;
-
-    Err ret = OK;
-
     const char* sql = get_shebang ? "SELECT shebang, content FROM scripts WHERE name = ?;"
                                   : "SELECT shebang, content FROM scripts WHERE name = ?;";
+
+    Err ret = OK;
 
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
@@ -204,6 +202,49 @@ Err getScriptContent(sqlite3* db, char* name, char* buffer, bool get_shebang) {
 
 err:
     LOG_DB_ERR(db);
+    sqlite3_finalize(stmt);
+    return ret;
+}
+
+Err deleteScript(sqlite3* db, char* name) {
+    sqlite3_stmt* stmt;
+    const char* sql = "DELETE FROM scripts WHERE scripts.name = ?;";
+
+    int rc = 0;
+
+    Err ret = OK;
+
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        ret = ERR_DB_DELETE;
+        LOG_DB_ERR(db);
+        goto err;
+    }
+
+    sqlite3_bind_text(stmt, 1, name, -1, SQLITE_STATIC);
+
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_DONE) {
+        int changes = sqlite3_changes(db);
+
+        if (changes <= 0) {
+            STDOUT_LOGGER_ERROR("cannot find script '%s' to delete", name);
+
+            ret = ERR_DB_DELETE;
+            goto err;
+        }
+    } else {
+        ret = ERR_DB_DELETE;
+        LOG_DB_ERR(db);
+        goto err;
+    }
+
+    STDOUT_LOGGER_INFO("script %s deleted successfully", name);
+
+    sqlite3_finalize(stmt);
+    return ret;
+
+err:
     sqlite3_finalize(stmt);
     return ret;
 }

@@ -96,5 +96,6 @@ void printHelp(char* program_name) {
     fprintf(stderr, "\t-b, --shebang <value>\tSpecify a shebang to the new script\n");
     fprintf(stderr, "\t-l, --list\t\tList all scripts\n");
     fprintf(stderr, "\t-s, --show <name>\tShow contents of the specified script\n");
+    fprintf(stderr, "\t-d, --delete <name>\tDelete the specified script\n");
     fprintf(stderr, "\t-h, --help\t\tPrint the help output\n");
 }
