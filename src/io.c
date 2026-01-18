@@ -6,29 +6,26 @@
 #include "include/database.h"
 #include "include/io.h"
 
+#include "utils/include/fs.h"
 #include "utils/include/log.h"
 
 static const int CONTENT_SIZE = 1024;
 
 Err importScriptContent(char* buffer, int buffer_size, FILE** fp) {
-    char template[] = "/tmp/script_XXXXXX";
-
     const char* editor = getenv("EDITOR") != NULL ? getenv("EDITOR") : "nano";
-    int fd = 0;
     char command[256];
 
     char content[CONTENT_SIZE];
 
     Err rc = OK;
 
-    fd = mkstemp(template);
-    if (fd == -1) {
+    char* temp = createTempFile();
+    if (temp == NULL) {
         rc = ERR_IO_WRITE;
         goto err;
     }
-    close(fd);
 
-    snprintf(command, sizeof(command), "%s %s", editor, template);
+    snprintf(command, sizeof(command), "%s %s", editor, temp);
 
     if (system(command) == -1) {
         logger(ERROR, "io", "failed to open temp the file with '%s'", editor);
@@ -36,7 +33,7 @@ Err importScriptContent(char* buffer, int buffer_size, FILE** fp) {
         goto err;
     }
 
-    *fp = fopen(template, "r");
+    *fp = fopen(temp, "r");
     if (fp == NULL) {
         rc = ERR_IO_READ;
         goto err;
@@ -50,15 +47,13 @@ Err importScriptContent(char* buffer, int buffer_size, FILE** fp) {
 
     strncpy(buffer, content, buffer_size);
 
-    if (remove(template) != 0) {
-        logger(WARNING, "io", "failed to delete the temp file after retrieving contents");
-    }
-
+    deleteTempFile(&temp);
     return rc;
 
 err:
     STDOUT_LOGGER_ERROR("%s", "cannot capture contents of the script");
 
+    deleteTempFile(&temp);
     return rc;
 }
 

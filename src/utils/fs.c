@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
-#include "errs.h"
 #include "include/fs.h"
 #include "include/log.h"
 
@@ -50,4 +51,54 @@ Err ensureDirectoryExists(char* path, bool create_if_not_exist) {
 
     ret = ERR;
     return ret;
+}
+
+Err ensureFileExists(char* filepath, bool create_if_not_exist) {
+    int rc = access(filepath, F_OK);
+
+    if (rc == 0) {
+        return OK;
+    } else if (rc == -1) {
+        if (create_if_not_exist) {
+            FILE* file = fopen(filepath, "w");
+            if (file == NULL)
+                return ERR_FS_FILE_CREATE;
+
+            fclose(file);
+            return OK_FS_FILE_CREATE;
+        } else {
+            return ERR_FS_FILE_NOT_EXIST;
+        }
+    }
+
+    return ERR;
+}
+
+char* createTempFile(void) {
+    char template[] = "/tmp/script_XXXXXX";
+    int fd = 0;
+
+    size_t src_len = sizeof(template);
+
+    fd = mkstemp(template);
+    if (fd == -1)
+        return NULL;
+    close(fd);
+
+    char* temp = malloc(src_len);
+    if (temp == NULL)
+        return NULL;
+
+    (void)strncpy(temp, template, src_len);
+
+    return temp;
+}
+
+void deleteTempFile(char** temp) {
+    if (temp != NULL && *temp != NULL) {
+        (void)unlink(*temp);
+
+        free(*temp);
+        *temp = NULL;
+    }
 }

@@ -8,8 +8,11 @@
 #define ERR_INFO                                                                                   \
     X_ERR(OK, "app", "success ^_^", false)                                                         \
     X_ERR(ERR, "app", "unexpected error occured x_x", true)                                        \
+    X_ERR(OK_FS_FILE_CREATE, "fs", "file created successfully", false)                             \
     X_ERR(OK_FS_DIR_CREATE, "fs", "directory created successfully", false)                         \
+    X_ERR(ERR_FS_FILE_CREATE, "fs", "failed to create file", false)                                \
     X_ERR(ERR_FS_DIR_CREATE, "fs", "failed to create directory", false)                            \
+    X_ERR(ERR_FS_FILE_NOT_EXIST, "fs", "failed to find file", false)                               \
     X_ERR(ERR_FS_DIR_NOT_EXIST, "fs", "failed to find directory", false)                           \
     X_ERR(ERR_FS_DATA_PATH_ACCESS, "fs", "failed to access data path", true)                       \
     X_ERR(ERR_IO_READ, "io", "failed to read file", true)                                          \
@@ -25,7 +28,7 @@
     X_ERR(ERR_DB_DELETE, "db", "failed to delete record(s) from the database", true)               \
     X_ERR(ERR_DB_DELETE_NO_MATCH, "db", "failed to find matching record(s) in the database to delete", true)
 
-#define ERR_INFO_COUNT 18
+#define ERR_INFO_COUNT 21
 
 #define X_ERR(code, tag, desc, exit) code,
 typedef enum Err { ERR_INFO } Err;

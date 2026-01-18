@@ -14,8 +14,13 @@ proc := shell('nproc')
 default:
     @just -f {{justfile()}} --list
 
+# install the executable
 install: build
     @{{cmake}} --install {{build_path}}
+
+# run the tests
+test:
+    @ctest -j{{proc}} --test-dir {{build_path}}
 
 # build the executable
 build:
