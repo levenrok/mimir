@@ -26,6 +26,10 @@
           gnumake
           valgrind
           gdb
+
+          (python3.withPackages (pypkgs: with pypkgs; [
+            pip
+          ]))
         ];
 
         env.LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
