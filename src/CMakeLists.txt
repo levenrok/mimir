@@ -3,7 +3,7 @@ include(GNUInstallDirs)
 find_library(SQLITE sqlite3)
 
 set(SRCS
-    ../main.c
+    main.c
     database.c
     io.c
     utils/errs.c

@@ -9,6 +9,8 @@ FetchContent_MakeAvailable(unity)
 
 add_executable(mimir_test
     test.c
+    fs/dir.c
+    fs/file.c
     fs/temp.c
     ../src/utils/fs.c
     ../src/utils/log.c

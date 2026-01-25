@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "src/include/database.h"
-#include "src/include/io.h"
+#include "include/database.h"
+#include "include/io.h"
 
-#include "src/utils/include/errs.h"
-#include "src/utils/include/log.h"
+#include "utils/include/errs.h"
+#include "utils/include/log.h"
 
 /**
  * Main Entrypoint
