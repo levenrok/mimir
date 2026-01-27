@@ -25,13 +25,14 @@ Err openDatabaseV2(Database* db, const char* path) {
 
 Err closeDatabaseV2(Database* db) {
     int rc = sqlite3_close_v2(db->db);
-    sqlite3_free(&(db->err_msg));
 
     if (rc != SQLITE_OK) {
+        db->err_msg = sqlite3_errmsg(db->db);
         db->db = NULL;
         return ERR_DB_CLOSE;
     }
 
     db->db = NULL;
+    db->err_msg = NULL;
     return OK;
 }
