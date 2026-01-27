@@ -20,6 +20,7 @@
     X_ERR(ERR_IO_EXECUTE, "io", "failed to execute command", true)                                           \
     X_ERR(ERR_DB_ACCESS, "db", "failed to access the database", true)                                        \
     X_ERR(ERR_DB_OPEN, "db", "failed to open the connection to the database", true)                          \
+    X_ERR(ERR_DB_INIT, "db", "failed to initialize the database", true)                                      \
     X_ERR(ERR_DB_CREATE_TABLE, "db", "failed to create database table", true)                                \
     X_ERR(ERR_DB_INSERT, "db", "failed to save record(s) to the database", true)                             \
     X_ERR(ERR_DB_INSERT_UNIQUE, "db", "failed to save duplicate record(s) to the database", true)            \
@@ -29,7 +30,7 @@
     X_ERR(ERR_DB_DELETE_NO_MATCH, "db", "failed to find matching record(s) in the database to delete", true) \
     X_ERR(ERR_DB_CLOSE, "db", "failed to close the connection to the database", false)
 
-#define ERR_INFO_COUNT 22
+#define ERR_INFO_COUNT 23
 
 #define X_ERR(code, tag, desc, exit) code,
 typedef enum Err { ERR_INFO } Err;
