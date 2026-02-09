@@ -24,6 +24,8 @@
         devShells.default = pkgs.mkShell {
           name = "c";
 
+          inputsFrom = [ self.packages.${system}.default ];
+
           nativeBuildInputs = with pkgs; [
             clang-tools
             clang
