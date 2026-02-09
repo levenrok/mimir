@@ -19,3 +19,14 @@ target_link_libraries(database_test PRIVATE unity m ${SQLITE})
 target_include_directories(database_test PRIVATE ../src/include ../src/utils/include)
 
 add_test(NAME DatabaseTest COMMAND database_test)
+
+add_executable(fs_test
+  fs_test.c
+  ../src/utils/fs.c
+  ../src/utils/log.c
+)
+
+target_link_libraries(fs_test PRIVATE m unity)
+target_include_directories(fs_test PRIVATE ../src/include ../src/utils/include)
+
+add_test(NAME FsTest COMMAND fs_test)
