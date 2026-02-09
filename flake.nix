@@ -1,45 +1,56 @@
 {
-  description = "Flake for C";
+  description = "Flake for C Development";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs }:
-    let
-      system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages."${system}";
-    in
+  outputs =
     {
-      packages.${system}.default = pkgs.callPackage ./default.nix { };
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+      in
+      {
+        packages.default = pkgs.callPackage ./default.nix { };
 
-      devShells.${system}.default = pkgs.mkShell {
-        name = "c";
+        devShells.default = pkgs.mkShell {
+          name = "c";
 
-        inputsFrom = [ self.packages.${system}.default ];
+          nativeBuildInputs = with pkgs; [
+            clang-tools
+            clang
+            gcc
 
-        nativeBuildInputs = with pkgs;[
-          clang-tools
-          clang
-          gcc
+            gnumake
+            valgrind
+            gdb
 
-          gnumake
-          valgrind
-          gdb
+            (python3.withPackages (pkpkgs: with pkpkgs; [
+                pip
+            ]))
+          ];
 
-          (python3.withPackages (pypkgs: with pypkgs; [
-            pip
-          ]))
-        ];
+          buildInputs = with pkgs; [
+            zlib
+          ];
 
-        env.LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
-          pkgs.stdenv.cc.cc.lib
-          pkgs.zlib
-        ];
+          env.LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
+            pkgs.stdenv.cc.cc.lib
+            pkgs.zlib
+          ];
 
-        shellHook = ''
-          echo -e "\033[0;32mDone!\033[0m"
-        '';
-      };
-    };
+          shellHook = ''
+            echo -e "\033[0;32mDone!\033[0m"
+          '';
+        };
+      }
+    );
 }
