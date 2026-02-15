@@ -3,39 +3,39 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "include/database.h"
 #include "include/io.h"
 
 #include "utils/include/fs.h"
 #include "utils/include/log.h"
 
-static const int CONTENT_SIZE = 1024;
+#ifndef CONTENT_SIZE
+#define CONTENT_SIZE 1024
+#endif
 
-Err importScriptContent(char* buffer, int buffer_size, FILE** fp) {
+IoErr importScriptContent(char* buffer, int buffer_size, FILE** fp) {
     const char* editor = getenv("EDITOR") != NULL ? getenv("EDITOR") : "nano";
     char command[256];
 
     char content[CONTENT_SIZE];
 
-    Err rc = OK;
+    IoErr rc = IO_OK;
 
     char* temp = createTempFile();
     if (temp == NULL) {
-        rc = ERR_IO_WRITE;
+        rc = IO_ERR_WRITE;
         goto err;
     }
 
     snprintf(command, sizeof(command), "%s %s", editor, temp);
 
     if (system(command) == -1) {
-        logger(ERROR, "io", "failed to open temp the file with '%s'", editor);
-        rc = ERR_IO_READ;
+        rc = IO_ERR_READ;
         goto err;
     }
 
     *fp = fopen(temp, "r");
     if (fp == NULL) {
-        rc = ERR_IO_READ;
+        rc = IO_ERR_READ;
         goto err;
     } else {
         size_t content_size = fread(content, 1, CONTENT_SIZE - 1, *fp);
@@ -57,18 +57,17 @@ err:
     return rc;
 }
 
-Err runScriptContent(sqlite3* db, char* name, FILE** fp) {
+IoErr runScriptContent(Database* db, char* name, FILE** fp) {
     char command[1024];
     char output[1024];
 
-    handle_err(getScriptContent(db, name, command, false), &db, fp);
+    if (getScriptContent(db, name, command, false) != DB_OK)
+        goto err;
 
     *fp = popen(command, "r");
     if (*fp == NULL) {
         STDOUT_LOGGER_ERROR("cannot run the script '%s'", name);
-
-        logger(ERROR, "io", "failed to create pipe stream to run command '%s'", command);
-        return ERR_IO_EXECUTE;
+        goto err;
     }
 
     while (fgets(output, sizeof(output), *fp) != NULL) {
@@ -76,7 +75,10 @@ Err runScriptContent(sqlite3* db, char* name, FILE** fp) {
     }
 
     pclose(*fp);
-    return OK;
+    return IO_OK;
+
+err:
+    return IO_ERR_EXECUTE;
 }
 
 void printMan(char* program_name) {
