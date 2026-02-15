@@ -1,77 +1,71 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#if defined(_WIN32)
+#include <io.h>
+#elif defined(__linux__) || defined(__APPLE__)
 #include <unistd.h>
+#endif
 
 #include "include/fs.h"
-#include "include/log.h"
 
-Err getAppDataPath(char* path_buffer, char* filename) {
-    const char* data_home = getenv("XDG_DATA_HOME");
+PathErr ensureDirectoryExists(char* path, bool create_if_not_exist) {
+#if defined(_WIN32)
+    struct _stat st;
 
-    char base_path[256];
-
-    if (data_home && data_home[0] != '\0') {
-        snprintf(base_path, sizeof(base_path), "%s/mimir", data_home);
-    } else {
-        const char* home = getenv("HOME");
-
-        snprintf(base_path, sizeof(base_path), "%s/.local/share/mimir", home);
-    }
-
-    Err rc = ensureDirectoryExists(base_path, true);
-    if (rc == OK_FS_DIR_CREATE)
-        logger(INFO, "data directory not found at '%s'. creating...", base_path);
-    else if (rc == ERR_FS_DIR_NOT_EXIST || rc == ERR_FS_DATA_PATH_ACCESS)
-        return ERR_FS_DATA_PATH_ACCESS;
-
-    snprintf(path_buffer, sizeof(base_path) + 1, "%s/%s", base_path, filename);
-
-    return OK;
-}
-
-Err ensureDirectoryExists(char* path, bool create_if_not_exist) {
-    struct stat st = {0};
-
-    Err ret = OK;
+    int rc = _stat(path, &st);
+#elif defined(__linux__) || defined(__APPLE__)
+    struct stat st;
 
     int rc = stat(path, &st);
+#endif
     if (rc == 0) {
-        return ret;
-    } else if (rc == -1) {
+        return PATH_OK;
+    } else if (rc == -1 && errno == ENOENT) {
         if (create_if_not_exist) {
-            ret = mkdir(path, 0700) == 0 ? OK_FS_DIR_CREATE : ERR_FS_DIR_CREATE;
-            return ret;
+#if defined(_WIN32)
+            if (_mkdir(path) == 0)
+                return PATH_OK_DIR_CREATE;
+            else
+                return PATH_ERR_DIR_CREATE;
+#elif defined(__linux__) || defined(__APPLE__)
+            if (mkdir(path, 0700) == 0)
+                return PATH_OK_DIR_CREATE;
+            else
+                return PATH_ERR_DIR_CREATE;
+#endif
         } else {
-            ret = ERR_FS_DIR_NOT_EXIST;
-            return ret;
+            return PATH_ERR_DIR_NOT_EXIST;
         }
     }
-
-    ret = ERR;
-    return ret;
+    return PATH_ERR;
 }
 
-Err ensureFileExists(char* filepath, bool create_if_not_exist) {
+PathErr ensureFileExists(char* filepath, bool create_if_not_exist) {
+#if defined(_WIN32)
+    int rc = _access(filepath, F_OK);
+#elif defined(__linux__) || defined(__APPLE__)
     int rc = access(filepath, F_OK);
+#endif
 
     if (rc == 0) {
-        return OK;
+        return PATH_OK;
     } else if (rc == -1) {
         if (create_if_not_exist) {
             FILE* file = fopen(filepath, "w");
             if (file == NULL)
-                return ERR_FS_FILE_CREATE;
+                return PATH_ERR_FILE_CREATE;
 
             fclose(file);
-            return OK_FS_FILE_CREATE;
+            return PATH_OK_FILE_CREATE;
         } else {
-            return ERR_FS_FILE_NOT_EXIST;
+            return PATH_ERR_FILE_NOT_EXIST;
         }
     }
 
-    return ERR;
+    return PATH_ERR;
 }
 
 char* createTempFile(void) {

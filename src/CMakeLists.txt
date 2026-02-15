@@ -6,7 +6,6 @@ set(SRCS
     main.c
     database.c
     io.c
-    utils/errs.c
     utils/fs.c
     utils/log.c
     ../external/argtable3.c
@@ -17,7 +16,7 @@ set(SRCS
 set(EXE mimir)
 
 add_compile_options(-Wall -Werror -Wpedantic)
-include_directories(src/include src/utils/include external)
+include_directories(src src/include src/utils/include external)
 
 add_executable(${EXE} ${SRCS})
 target_link_libraries(${EXE} PRIVATE m ${SQLITE})
