@@ -4,23 +4,18 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "include/fs.h"
 #include "include/log.h"
 
-static const int MSG_SIZE = 256;
+#ifndef MSG_SIZE
+#define MSG_SIZE 256
+#endif
 
 #undef Y
 #define Y(level) #level,
 static const char* log_level_names[] = {LOG_LEVEL};
 
-void logger(LogLevel level, char* tag, char* fmt, ...) {
-    char log_path[256];
-    if (getAppDataPath(log_path, "mimir.log") != OK) {
-        STDOUT_LOGGER_WARNING("%s", "cannot access the log file. stopping logger...");
-        return;
-    }
-
-    FILE* log_file = fopen(log_path, "a");
+void logger(const char* path, LogLevel level, char* tag, char* fmt, ...) {
+    FILE* log_file = fopen(path, "a");
 
     time_t now;
     struct tm result;

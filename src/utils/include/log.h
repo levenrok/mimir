@@ -1,5 +1,5 @@
-#ifndef __MIMIR_LOG_H__
-#define __MIMIR_LOG_H__
+#ifndef MIMIR_LOG_H
+#define MIMIR_LOG_H
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -30,13 +30,14 @@ typedef enum LogLevel { LOG_LEVEL } LogLevel;
 /**
  * @brief function to help with logging application status
  *
+ * @param path Path to the log file
  * @param level Log level defined by the 'LogLevel' enum. (SUCCESS, ERROR, ...)
  * @param tag Optional tag to make debugging easier
  * @param msg Log message to be printed
  */
-void logger(LogLevel level, char* tag, char* fmt, ...);
+void logger(const char* path, LogLevel level, char* tag, char* fmt, ...);
 
 void stdout_logger(LogLevel level, char* fmt, ...);
 void stdout_debug(const char* msg, const char* code, const char* filename, const int line);
 
-#endif  // __MIMIR_LOG_H__
+#endif  // MIMIR_LOG_H
