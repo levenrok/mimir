@@ -6,8 +6,6 @@
 
 #include "utils/include/log.h"
 
-#define LOG_DB_ERR(db) logger(ERROR, "db", "%s", sqlite3_errmsg(db))
-
 static const int CONTENT_SIZE = 1024;
 static const int SCRIPT_SIZE = (CONTENT_SIZE + 32);
 
@@ -26,7 +24,7 @@ static inline void cleanup_errmsg(char** zErrMsg) {
         sqlite3_free(*zErrMsg);
 }
 
-DbErr openDatabase(Database* db, const char* path) {
+DbErr openDatabase(Database* db, const char* path, const char* log_path) {
     int rc = 0;
 
     db->db = NULL;
@@ -34,7 +32,7 @@ DbErr openDatabase(Database* db, const char* path) {
 
     rc = sqlite3_open_v2(path, &(db->db), SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL);
     if (rc != SQLITE_OK) {
-        LOG_DB_ERR(db->db);
+        logger(log_path, ERROR, "db", "%s", sqlite3_errmsg(db->db));
         return DB_ERR_OPEN;
     }
 
@@ -43,7 +41,7 @@ DbErr openDatabase(Database* db, const char* path) {
     return DB_OK;
 }
 
-DbErr initDatabase(Database* db) {
+DbErr initDatabase(Database* db, const char* log_path) {
 #if defined(__GNUC__) || defined(__clang__)
     sqlite3_stmt* stmt __attribute__((cleanup(cleanup_stmt)));
     char* zErrMsg __attribute__((cleanup(cleanup_errmsg))) = NULL;
@@ -62,14 +60,14 @@ DbErr initDatabase(Database* db) {
 
     int rc = sqlite3_exec(db->db, "PRAGMA journal_mode = WAL;", NULL, NULL, &zErrMsg);
     if (rc != SQLITE_OK) {
-        logger(ERROR, "db", "%s", zErrMsg);
+        logger(log_path, ERROR, "db", "%s", zErrMsg);
         ret = DB_ERR_INIT;
         goto err;
     }
 
     rc = sqlite3_exec(db->db, zSql, NULL, NULL, &zErrMsg);
     if (rc != SQLITE_OK) {
-        LOG_DB_ERR(db->db);
+        logger(log_path, ERROR, "db", "%s", sqlite3_errmsg(db->db));
         ret = DB_ERR_CREATE_TABLE;
         goto err;
     }
@@ -159,7 +157,6 @@ DbErr insertScript(Database* db, char* name, char* content, char* shebang) {
     return ret;
 
 err:
-    LOG_DB_ERR(db->db);
 #if !defined(__GNUC__) || !defined(__clang__)
     cleanup_stmt(&stmt);
 #endif
@@ -205,7 +202,6 @@ DbErr getScripts(Database* db) {
 
 err:
     STDOUT_LOGGER_ERROR("%s", "cannot get scripts from the database!");
-    LOG_DB_ERR(db->db);
 #if !defined(__GNUC__) || !defined(__clang__)
     sqlite3_finalize(stmt);
 #endif
@@ -264,7 +260,6 @@ DbErr getScriptContent(Database* db, char* name, char* buffer, bool get_shebang)
     return ret;
 
 err:
-    LOG_DB_ERR(db->db);
     sqlite3_finalize(stmt);
     return ret;
 }
@@ -284,7 +279,6 @@ DbErr deleteScript(Database* db, char* name) {
     rc = sqlite3_prepare_v2(db->db, zSql, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
         ret = DB_ERR;
-        LOG_DB_ERR(db->db);
         goto err;
     }
 
@@ -302,7 +296,6 @@ DbErr deleteScript(Database* db, char* name) {
         }
     } else {
         ret = DB_ERR_DELETE;
-        LOG_DB_ERR(db->db);
         goto err;
     }
 
@@ -314,7 +307,6 @@ DbErr deleteScript(Database* db, char* name) {
     return ret;
 
 err:
-    LOG_DB_ERR(db->db);
 #if !defined(__GNUC__) || !defined(__clang__)
     sqlite3_finalize(stmt);
 #endif
@@ -325,7 +317,6 @@ DbErr closeDatabase(Database* db) {
     int rc = sqlite3_close_v2(db->db);
 
     if (rc != SQLITE_OK) {
-        LOG_DB_ERR(db->db);
         db->db = NULL;
         return DB_ERR_CLOSE;
     }

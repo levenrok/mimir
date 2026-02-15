@@ -24,8 +24,8 @@ typedef enum DbErr {
     DB_ERR_CLOSE,
 } DbErr;
 
-DbErr openDatabase(Database* db, const char* path);
-DbErr initDatabase(Database* db);
+DbErr openDatabase(Database* db, const char* path, const char* log_path);
+DbErr initDatabase(Database* db, const char* log_path);
 DbErr insertScript(Database* db, char* name, char* content, char* shebang);
 DbErr getScripts(Database* db);
 DbErr getScriptContent(Database* db, char* name, char* buffer, bool get_shebang);

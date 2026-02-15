@@ -12,4 +12,16 @@
 #define MIMIR_APPLICATION_NAME "mimir"
 #define MIMIR_APPLICATION_VERSION "0.7.0"
 
-#endif // MIMIR_MAIN_H
+typedef struct Info {
+    const char* base_path;
+    const char* database_path;
+    const char* log_path;
+} Info;
+
+typedef struct {
+    char name[128];
+    char contents[1024];
+    char shebang[32];
+} Script;
+
+#endif  // MIMIR_MAIN_H
