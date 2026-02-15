@@ -4,7 +4,6 @@
 #include "unity.h"
 
 #include "../src/include/database.h"
-#include "../src/utils/include/errs.h"
 
 Database db;
 
@@ -31,7 +30,7 @@ void test_open_database() {
     sqlite3_stmt* stmt;
     const char* db_name = "open.sqlite3";
 
-    TEST_ASSERT_EQUAL(OK, openDatabase(&open, db_name));
+    TEST_ASSERT_EQUAL(DB_OK, openDatabase(&open, db_name, NULL));
     TEST_ASSERT_EQUAL(0, strncmp(db_name, open.path, strlen(db_name)));
     TEST_ASSERT_NOT_NULL(open.db);
 
@@ -52,7 +51,7 @@ void test_init_database() {
         "shebang TEXT,"
         "content TEXT NOT NULL)";
 
-    TEST_ASSERT_EQUAL(OK, initDatabase(&db));
+    TEST_ASSERT_EQUAL(DB_OK, initDatabase(&db, NULL));
 
     TEST_ASSERT_EQUAL(SQLITE_OK, sqlite3_prepare_v2(db.db, "PRAGMA journal_mode;", -1, &stmt, NULL));
     TEST_ASSERT_EQUAL(SQLITE_ROW, sqlite3_step(stmt));
@@ -71,7 +70,7 @@ void test_close_database() {
     TEST_ASSERT_EQUAL(SQLITE_OK,
                       sqlite3_open_v2(db_name, &(close.db), SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL));
 
-    TEST_ASSERT_EQUAL(OK, closeDatabase(&close));
+    TEST_ASSERT_EQUAL(DB_OK, closeDatabase(&close));
     TEST_ASSERT_NULL(close.db);
 
     TEST_ASSERT_NOT_EQUAL(SQLITE_OK, sqlite3_prepare_v2(close.db, "SELECT 1;", -1, &stmt, NULL));

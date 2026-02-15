@@ -6,7 +6,6 @@ set(SRCS
     main.c
     database.c
     io.c
-    utils/errs.c
     utils/fs.c
     utils/log.c
     ../external/argtable3.c
